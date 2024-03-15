@@ -2,6 +2,12 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Chart from "chart.js/auto";
 
+import { Select, Space } from "antd";
+
+const handleChange = (value: string) => {
+  console.log(`selected ${value}`);
+};
+
 interface ChartData {
   labels: number[];
   datasets: {
@@ -14,7 +20,7 @@ interface ChartData {
 }
 type Item = {
   id: number;
-  createdAt:string;
+  createdAt: string;
   PageView: string;
   data: string[];
 };
@@ -31,7 +37,7 @@ const ChartFromAPI: React.FC = () => {
         const response = await axios.get(
           "https://shopify.gapsoftware.asia/api/event/All?shop=lucky-birds-store.myshopify.com"
         );
-        const responseData = response.data; 
+        const responseData = response.data;
         console.log(responseData);
         const labels = responseData.map((item: Item) => {
           const date = new Date(item.createdAt);
@@ -40,11 +46,8 @@ const ChartFromAPI: React.FC = () => {
           const year = date.getFullYear();
           return `${day}/${month}/${year}`;
         });
-        
-        console.log(labels);
 
-        const pageViews = responseData.map((item: Item) => item.PageView); 
-
+        const pageViews = responseData.map((item: Item) => item.PageView);
 
         setChartData({
           labels: labels,
@@ -86,8 +89,8 @@ const ChartFromAPI: React.FC = () => {
               display: true,
               text: "Total",
             },
-            min: 0,  
-            max: 10, 
+            min: 0,
+            max: 10,
           },
         },
       },
@@ -98,7 +101,28 @@ const ChartFromAPI: React.FC = () => {
     };
   }, [chartData]);
 
-  return <canvas id="myChart" width="400" height="400"></canvas>;
+  return (
+    <>
+      <div>
+        <Space wrap>
+          <Select
+            defaultValue="All events"
+            style={{ width: 120 }}
+            onChange={handleChange}
+            options={[
+              { value: "PageView", label: "PageView" },
+              { value: "ViewContent", label: "ViewContent" },
+              { value: "AddToCart", label: "AddToCart" },
+              { value: "InitiateCheckout", label: "InitiateCheckout",},
+            ]}
+          />
+        </Space>
+      </div>
+      <div>
+        <canvas id="myChart" width="400" height="400"></canvas>
+      </div>
+    </>
+  );
 };
 
 export default ChartFromAPI;
