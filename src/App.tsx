@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import Chart from "chart.js/auto";
 
@@ -22,10 +22,12 @@ type Item = {
   id: number;
   createdAt: string;
   PageView: string;
-  data: string[];
+  ViewContent: string;
+  AddToCart: string;
+  InitiateCheckout: string;
 };
 
-const ChartFromAPI: React.FC = () => {
+const App = () => {
   const [chartData, setChartData] = useState<ChartData>({
     labels: [],
     datasets: [],
@@ -39,7 +41,7 @@ const ChartFromAPI: React.FC = () => {
         );
         const responseData = response.data;
         console.log(responseData);
-        const labels = responseData.map((item: Item) => {
+        const dateTime = responseData.map((item: Item) => {
           const date = new Date(item.createdAt);
           const day = date.getDate();
           const month = date.getMonth() + 1;
@@ -47,17 +49,38 @@ const ChartFromAPI: React.FC = () => {
           return `${day}/${month}/${year}`;
         });
 
-        const pageViews = responseData.map((item: Item) => item.PageView);
+     
 
         setChartData({
-          labels: labels,
+          labels: dateTime,
           datasets: [
             {
               label: "Page Views",
-              data: pageViews,
+              data: [],
               fill: false,
               borderColor: "rgb(75, 192, 192)",
               tension: 1,
+            },
+            {
+              label: "ViewContent",
+              data: [],
+              fill: false,
+              borderColor: "rgb(192, 75, 75)",
+              tension: 1,
+            },
+            {
+              label: "AddToCart",
+              data: [],
+              fill: false,
+              borderColor: "rgb(75, 192, 75)",
+              tension: 1,
+            },
+            {
+              label: "InitiateCheckout",
+              data: [0, 2, 3, 4, 5, 6, 7, 8, 9, 4, 5, 7, 5],
+              fill: false,
+              borderColor: "rgb(192, 192, 75)",
+              tension: 0.1,
             },
           ],
         });
@@ -70,7 +93,7 @@ const ChartFromAPI: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const ctx = document.getElementById("myChart") as HTMLCanvasElement;
+    const ctx = document.querySelector(".myChart") as HTMLCanvasElement;
 
     const newChart = new Chart(ctx, {
       type: "line",
@@ -113,16 +136,16 @@ const ChartFromAPI: React.FC = () => {
               { value: "PageView", label: "PageView" },
               { value: "ViewContent", label: "ViewContent" },
               { value: "AddToCart", label: "AddToCart" },
-              { value: "InitiateCheckout", label: "InitiateCheckout",},
+              { value: "InitiateCheckout", label: "InitiateCheckout" },
             ]}
           />
         </Space>
       </div>
       <div>
-        <canvas id="myChart" width="400" height="400"></canvas>
+        <canvas className="myChart" width="400" height="400"></canvas>
       </div>
     </>
   );
 };
 
-export default ChartFromAPI;
+export default App;
