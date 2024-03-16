@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Select, Space } from "antd";
-import * as echarts from 'echarts';
+import * as echarts from "echarts";
 
 interface EventData {
   eventName: string;
@@ -37,15 +37,27 @@ const App = () => {
           });
           return Array.from(eventNames);
         };
-extractEventNames(responseData)
-        const filteredEventNames = value === "All events"
-          ? ["PageView", "ViewContent", "AddToCart", "InitiateCheckout"]
-          : [value];
+        extractEventNames(responseData);
+        const filteredEventNames =
+          value === "All events"
+            ? ["PageView", "ViewContent", "AddToCart", "InitiateCheckout"]
+            : [value];
 
         const time = [
-          "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", 
-          "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", 
-          "22:00", "23:00"
+          "10:00",
+          "11:00",
+          "12:00",
+          "13:00",
+          "14:00",
+          "15:00",
+          "16:00",
+          "17:00",
+          "18:00",
+          "19:00",
+          "20:00",
+          "21:00",
+          "22:00",
+          "23:00",
         ];
 
         const isInTimeRange = (
@@ -111,27 +123,35 @@ extractEventNames(responseData)
   useEffect(() => {
     if (!chartData) return;
 
-    const chart = echarts.init(document.getElementById('chart') as HTMLDivElement);
+    const chart = echarts.init(
+      document.getElementById("chart") as HTMLDivElement
+    );
     chart.setOption({
       tooltip: {
-        trigger: 'axis'
+        trigger: "axis",
       },
       legend: {
-        data: chartData.datasets.map((dataset: Dataset) => dataset.label)
+        data: chartData.datasets.map((dataset: Dataset) => dataset.label),
+      },
+      grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true
       },
       xAxis: {
-        type: 'category',
-        data: chartData.labels
+        type: "category",
+        data: chartData.labels,
       },
       yAxis: {
-        type: 'value'
+        type: "value",
       },
       series: chartData.datasets.map((dataset: Dataset) => ({
         name: dataset.label,
-        type: 'line',
- 
-        data: dataset.data
-      }))
+        type: "line",
+
+        data: dataset.data,
+      })),
     });
 
     return () => {
