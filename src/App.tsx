@@ -6,7 +6,6 @@ import { Select, Space } from "antd";
 interface EventData {
   eventName: string;
   eventTime: number;
-  // Thêm các trường dữ liệu khác nếu cần
 }
 
 interface Dataset {
@@ -27,6 +26,8 @@ const App = () => {
     datasets: [],
   });
 
+  const [value, setValue] = useState<string>("All events");
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -43,17 +44,12 @@ const App = () => {
           return Array.from(eventNames);
         };
 
-        const eventNames = extractEventNames(responseData);
-
-        const desiredEventNames = [
-          "PageView",
-          "ViewContent",
-          "AddToCart",
-          "InitiateCheckout",
-        ];
-        const filteredEventNames = eventNames.filter((eventName) =>
-          desiredEventNames.includes(eventName)
-        );
+        extractEventNames(responseData);
+        const filteredEventNames =
+          value === "All events"
+            ? ["PageView", "ViewContent", "AddToCart", "InitiateCheckout"]
+            : [value];
+        
 
         const time = [
           "10:00",
@@ -72,11 +68,19 @@ const App = () => {
           "23:00",
         ];
 
-        const isInTimeRange = (eventTime: string, startTime: string, endTime: string): boolean => {
-          return (eventTime >= startTime) && (eventTime < endTime);
+        const isInTimeRange = (
+          eventTime: string,
+          startTime: string,
+          endTime: string
+        ): boolean => {
+          return eventTime >= startTime && eventTime < endTime;
         };
 
-        const filterDataByTime = (responseData: EventData[], time: string[], eventName: string): { time: string, count: number }[] => {
+        const filterDataByTime = (
+          responseData: EventData[],
+          time: string[],
+          eventName: string
+        ): { time: string; count: number }[] => {
           const dataTest = time
             .map((startTime, index) => {
               const endTime = time[index + 1];
@@ -124,7 +128,7 @@ const App = () => {
     };
 
     fetchData();
-  }, []);
+  }, [value]);
 
   useEffect(() => {
     const ctx = document.querySelector(".myChart") as HTMLCanvasElement;
@@ -159,7 +163,7 @@ const App = () => {
   }, [chartData]);
 
   const handleChange = (value: string) => {
-    console.log(`selected ${value}`);
+    setValue(value);
   };
 
   return (
@@ -167,10 +171,12 @@ const App = () => {
       <div>
         <Space wrap>
           <Select
-            defaultValue="All events"
+           
             style={{ width: 120 }}
             onChange={handleChange}
+            value={value}
             options={[
+              {  value: "All events", label: "All events" },
               { value: "PageView", label: "PageView" },
               { value: "ViewContent", label: "ViewContent" },
               { value: "AddToCart", label: "AddToCart" },
