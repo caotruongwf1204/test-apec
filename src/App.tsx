@@ -1,31 +1,25 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Chart from "chart.js/auto";
-
 import { Select, Space } from "antd";
 
-const handleChange = (value: string) => {
-  console.log(`selected ${value}`);
-};
+interface EventData {
+  eventName: string;
+  eventTime: number;
+  // Thêm các trường dữ liệu khác nếu cần
+}
+
+interface Dataset {
+  label: string;
+  data: number[];
+  fill: boolean;
+  tension: number;
+}
 
 interface ChartData {
   labels: string[];
-  datasets: {
-    label: string;
-    data: number[]; // Chuyển từ dạng chuỗi sang số nguyên
-    fill: boolean;
-    borderColor: string;
-    tension: number;
-  }[];
+  datasets: Dataset[];
 }
-// type Item = {
-//   id: number;
-//   createdAt: string;
-//   PageView: string;
-//   ViewContent: string;
-//   AddToCart: string;
-//   InitiateCheckout: string;
-// };
 
 const App = () => {
   const [chartData, setChartData] = useState<ChartData>({
@@ -36,14 +30,13 @@ const App = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(
+        const response = await axios.get<EventData[]>(
           "https://shopify.gapsoftware.asia/api/event/All?shop=lucky-birds-store.myshopify.com"
         );
-        const responseData = response.data;
+        const responseData: EventData[] = response.data;
 
-        //Buoc 1: Loc truoc xem thuoc eventName nao ?
-        const extractEventNames = (events) => {
-          const eventNames = new Set();
+        const extractEventNames = (events: EventData[]): string[] => {
+          const eventNames = new Set<string>();
           events.forEach((event) => {
             eventNames.add(event.eventName);
           });
@@ -51,7 +44,6 @@ const App = () => {
         };
 
         const eventNames = extractEventNames(responseData);
-        console.log(eventNames);
 
         const desiredEventNames = [
           "PageView",
@@ -62,7 +54,7 @@ const App = () => {
         const filteredEventNames = eventNames.filter((eventName) =>
           desiredEventNames.includes(eventName)
         );
-        // Buoc 2: Set cung khoang thoi gian
+
         const time = [
           "10:00",
           "11:00",
@@ -80,25 +72,19 @@ const App = () => {
           "23:00",
         ];
 
-        // Buoc 3: Convert ve mang dataTest
-        // Hàm kiểm tra xem một thời gian có nằm trong khoảng thời gian cố định hay không
-        const isInTimeRange = (eventTime, startTime, endTime) => {
+        const isInTimeRange = (eventTime: string, startTime: string, endTime: string): boolean => {
           return (eventTime >= startTime) && (eventTime < endTime);
         };
 
-        // Hàm lọc dữ liệu theo khoảng thời gian
-        const filterDataByTime = (responseData, time, eventName) => {
+        const filterDataByTime = (responseData: EventData[], time: string[], eventName: string): { time: string, count: number }[] => {
           const dataTest = time
             .map((startTime, index) => {
-              // Khoang thoi gian ket thuc
               const endTime = time[index + 1];
 
-              // Dem so luong su kien trong khoang thoi gian gan vao count
               const count = responseData.filter((e) => {
                 const eventTime = new Date(
-                  parseInt(e.eventTime) * 1000
+                  e.eventTime * 1000
                 ).toLocaleTimeString("en-US", { hour12: false });
-                // console.log(eventTime, "eventTime");
 
                 return (
                   isInTimeRange(eventTime, startTime, endTime) &&
@@ -113,17 +99,14 @@ const App = () => {
           return dataTest;
         };
 
-        const datasets = [];
-
+        const datasets: Dataset[] = [];
 
         filteredEventNames.forEach((eventName) => {
           const dataChart = filterDataByTime(responseData, time, eventName);
-          // console.log(`Data for event "${eventName}":`, dataChart);
 
           const dataCount = dataChart.map((item) => item.count);
-          // console.log(`Data count for event "${eventName}":`, dataCount);
 
-          const dataset = {
+          const dataset: Dataset = {
             label: eventName,
             data: dataCount,
             fill: false,
@@ -174,6 +157,10 @@ const App = () => {
       newChart.destroy();
     };
   }, [chartData]);
+
+  const handleChange = (value: string) => {
+    console.log(`selected ${value}`);
+  };
 
   return (
     <>
