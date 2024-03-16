@@ -132,13 +132,12 @@ const App = () => {
       },
       legend: {
         data: chartData.datasets.map((dataset: Dataset) => dataset.label),
-      },
-      grid: {
-        left: '3%',
-        right: '4%',
-        bottom: '3%',
-        containLabel: true
-      },
+      },  
+      responsive: true,
+      resizeDelay: 200,
+    
+      resizeDebounce: 50,
+    
       xAxis: {
         type: "category",
         data: chartData.labels,
