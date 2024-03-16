@@ -135,7 +135,6 @@ const App = () => {
       },  
       responsive: true,
       resizeDelay: 200,
-    
       resizeDebounce: 50,
     
       xAxis: {
@@ -180,7 +179,7 @@ const App = () => {
           />
         </Space>
       </div>
-      <div id="chart" style={{ width: 1200, height: 500 }}></div>
+      <div id="chart" style={{ width: "100%", height: 500 }}></div>
     </>
   );
 };
